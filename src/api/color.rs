@@ -10,7 +10,7 @@
 use crate::serialize::*;
 use crate::wasm_bindgen::*;
 
-use arg_enum_proc_macro::ArgEnum;
+use crate::util::impl_str_enum;
 use num_derive::FromPrimitive;
 
 /// Sample position for subsampled chroma
@@ -45,7 +45,6 @@ pub use v_frame::pixel::ChromaSampling;
 ///
 /// As defined by “Color primaries” section of ISO/IEC 23091-4/ITU-T H.273
 #[derive(
-  ArgEnum,
   Debug,
   Clone,
   Copy,
@@ -85,11 +84,25 @@ pub enum ColorPrimaries {
   EBU3213 = 22,
 }
 
+impl_str_enum!(ColorPrimaries {
+  BT709,
+  Unspecified,
+  BT470M,
+  BT470BG,
+  BT601,
+  SMPTE240,
+  GenericFilm,
+  BT2020,
+  XYZ,
+  SMPTE431,
+  SMPTE432,
+  EBU3213,
+});
+
 /// Supported Transfer Characteristics
 ///
 /// As defined by “Transfer characteristics” section of ISO/IEC 23091-4/ITU-TH.273.
 #[derive(
-  ArgEnum,
   Debug,
   Clone,
   Copy,
@@ -139,11 +152,30 @@ pub enum TransferCharacteristics {
   HLG,
 }
 
+impl_str_enum!(TransferCharacteristics {
+  BT709,
+  Unspecified,
+  BT470M,
+  BT470BG,
+  BT601,
+  SMPTE240,
+  Linear,
+  Log100,
+  Log100Sqrt10,
+  IEC61966,
+  BT1361,
+  SRGB,
+  BT2020_10Bit,
+  BT2020_12Bit,
+  SMPTE2084,
+  SMPTE428,
+  HLG,
+});
+
 /// Matrix coefficients
 ///
 /// As defined by the “Matrix coefficients” section of ISO/IEC 23091-4/ITU-TH.273.
 #[derive(
-  ArgEnum,
   Debug,
   Clone,
   Copy,
@@ -187,6 +219,23 @@ pub enum MatrixCoefficients {
   ICtCp,
 }
 
+impl_str_enum!(MatrixCoefficients {
+  Identity,
+  BT709,
+  Unspecified,
+  FCC,
+  BT470BG,
+  BT601,
+  SMPTE240,
+  YCgCo,
+  BT2020NCL,
+  BT2020CL,
+  SMPTE2085,
+  ChromatNCL,
+  ChromatCL,
+  ICtCp,
+});
+
 /// Signal the content color description
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct ColorDescription {
@@ -211,7 +260,6 @@ impl ColorDescription {
 /// C.f. `VideoFullRangeFlag` variable specified in ISO/IEC 23091-4/ITU-T H.273
 #[wasm_bindgen]
 #[derive(
-  ArgEnum,
   Debug,
   Clone,
   Copy,
@@ -230,6 +278,8 @@ pub enum PixelRange {
   /// Full swing representation
   Full,
 }
+
+impl_str_enum!(PixelRange { Limited, Full });
 
 /// High dynamic range content light level
 ///

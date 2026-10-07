@@ -13,7 +13,6 @@ use std::mem::MaybeUninit;
 use std::sync::Arc;
 use std::{fmt, io, mem};
 
-use arg_enum_proc_macro::ArgEnum;
 use arrayvec::*;
 use bitstream_io::{BigEndian, BitWrite, BitWriter};
 use rayon::iter::*;
@@ -102,7 +101,7 @@ impl<T: Pixel> ReferenceFramesSet<T> {
 
 #[wasm_bindgen]
 #[derive(
-  ArgEnum, Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default,
+  Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default,
 )]
 #[repr(C)]
 pub enum Tune {
@@ -110,6 +109,8 @@ pub enum Tune {
   #[default]
   Psychovisual,
 }
+
+impl_str_enum!(Tune { Psnr, Psychovisual });
 
 const FRAME_ID_LENGTH: u32 = 15;
 const DELTA_FRAME_ID_LENGTH: u32 = 14;

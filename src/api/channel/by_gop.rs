@@ -70,7 +70,6 @@ impl<T: Pixel> SceneChange<T> {
       },
       enc.min_key_frame_interval as usize,
       enc.max_key_frame_interval as usize,
-      av_scenechange::CpuFeatureLevel::default(),
     );
 
     Self { frames: 0, pyramid_size, processed: 0, last_keyframe: 0, detector }
@@ -83,7 +82,7 @@ impl<T: Pixel> SceneChange<T> {
 
     let lookahead_ref: Vec<_> = lookahead[self.frames..].iter().collect();
 
-    let new_gop = self.detector.analyze_next_frame(
+    let (new_gop, _) = self.detector.analyze_next_frame(
       &lookahead_ref,
       self.processed,
       self.last_keyframe,

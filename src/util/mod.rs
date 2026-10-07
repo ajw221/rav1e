@@ -11,6 +11,7 @@ mod align;
 mod cdf;
 mod kmeans;
 mod logexp;
+mod str_enum;
 mod uninit;
 
 pub use v_frame::math::*;
@@ -22,3 +23,4 @@ pub use uninit::*;
 
 pub use kmeans::*;
 pub(crate) use logexp::*;
+pub(crate) use str_enum::*;

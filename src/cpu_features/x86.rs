@@ -7,22 +7,30 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use arg_enum_proc_macro::ArgEnum;
+use crate::util::impl_str_enum;
 use std::env;
 use std::str::FromStr;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, ArgEnum)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd)]
 pub enum CpuFeatureLevel {
   RUST,
   SSE2,
   SSSE3,
-  #[arg_enum(alias = "sse4.1")]
   SSE4_1,
   AVX2,
   AVX512,
-  #[arg_enum(alias = "avx512vpclmulqdq")]
   AVX512ICL,
 }
+
+impl_str_enum!(CpuFeatureLevel {
+  RUST,
+  SSE2,
+  SSSE3,
+  SSE4_1 | "sse4.1",
+  AVX2,
+  AVX512,
+  AVX512ICL | "avx512vpclmulqdq",
+});
 
 impl CpuFeatureLevel {
   #[cfg(test)]

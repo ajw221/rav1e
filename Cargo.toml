@@ -3,7 +3,7 @@ name = "rav1e"
 version = "0.8.0"
 authors = ["Thomas Daede <tdaede@xiph.org>"]
 edition = "2021"
-rust-version = "1.85.0"
+rust-version = "1.86.0"
 build = "build.rs"
 include = [
   "/Cargo.toml",
@@ -76,8 +76,7 @@ wasm = ["wasm-bindgen"]
 dump_lookahead_data = ["byteorder", "image"]
 
 [dependencies]
-arg_enum_proc_macro = "0.3.4"
-av-scenechange = { version = "0.14.1", default-features = false, features = [
+av-scenechange = { version = "0.20.0", default-features = false, features = [
   "asm",
 ] }
 bitstream-io = "4.1.0"

@@ -295,7 +295,6 @@ impl<T: Pixel> ContextInner<T> {
       },
       enc.min_key_frame_interval as usize,
       enc.max_key_frame_interval as usize,
-      av_scenechange::CpuFeatureLevel::default(),
     );
     keyframe_detector.enable_cache();
 
@@ -885,11 +884,13 @@ impl<T: Pixel> ContextInner<T> {
     next_lookahead_frame: &mut u64, keyframes: &mut BTreeSet<u64>,
   ) {
     if keyframes_forced.contains(next_lookahead_frame)
-      || keyframe_detector.analyze_next_frame(
-        lookahead_frames,
-        *next_lookahead_frame as usize,
-        *keyframes.iter().last().unwrap() as usize,
-      )
+      || keyframe_detector
+        .analyze_next_frame(
+          lookahead_frames,
+          *next_lookahead_frame as usize,
+          *keyframes.iter().last().unwrap() as usize,
+        )
+        .0
     {
       keyframes.insert(*next_lookahead_frame);
     }

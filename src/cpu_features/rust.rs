@@ -7,13 +7,15 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use arg_enum_proc_macro::ArgEnum;
+use crate::util::impl_str_enum;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, ArgEnum, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Default)]
 pub enum CpuFeatureLevel {
   #[default]
   RUST,
 }
+
+impl_str_enum!(CpuFeatureLevel { RUST });
 
 impl CpuFeatureLevel {
   #[cfg(test)]
