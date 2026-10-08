@@ -9,6 +9,7 @@
 
 use crate::api::channel::data::*;
 use crate::api::config::*;
+use crate::api::scenechange::KeyframeDetector;
 use crate::api::util::*;
 use crate::api::EncoderConfig;
 use crate::api::InterConfig;
@@ -17,7 +18,6 @@ use crossbeam::channel::*;
 
 use crate::frame::*;
 use crate::util::Pixel;
-use av_scenechange::SceneChangeDetector;
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -41,36 +41,12 @@ struct SceneChange<T: Pixel> {
   pyramid_size: usize,
   processed: usize,
   last_keyframe: usize,
-  detector: SceneChangeDetector<T>,
+  detector: KeyframeDetector<T>,
 }
 
 impl<T: Pixel> SceneChange<T> {
   fn new(pyramid_size: usize, enc: &EncoderConfig) -> Self {
-    let inter_cfg = InterConfig::new(enc);
-    let lookahead_distance = inter_cfg.keyframe_lookahead_distance() as usize;
-    let detector = SceneChangeDetector::new(
-      (enc.width, enc.height),
-      enc.bit_depth,
-      av_scenechange::Rational32::new(
-        enc.time_base.den as i32,
-        enc.time_base.num as i32,
-      ),
-      enc.chroma_sampling,
-      lookahead_distance,
-      match enc.speed_settings.scene_detection_mode {
-        super::SceneDetectionSpeed::Fast => {
-          av_scenechange::SceneDetectionSpeed::Fast
-        }
-        super::SceneDetectionSpeed::Standard => {
-          av_scenechange::SceneDetectionSpeed::Standard
-        }
-        super::SceneDetectionSpeed::None => {
-          av_scenechange::SceneDetectionSpeed::None
-        }
-      },
-      enc.min_key_frame_interval as usize,
-      enc.max_key_frame_interval as usize,
-    );
+    let detector = KeyframeDetector::new(enc);
 
     Self { frames: 0, pyramid_size, processed: 0, last_keyframe: 0, detector }
   }

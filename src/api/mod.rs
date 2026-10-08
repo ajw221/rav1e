@@ -21,6 +21,8 @@ pub mod context;
 pub(crate) mod internal;
 /// Lookahead-specific methods
 pub(crate) mod lookahead;
+/// Scene change detection
+pub(crate) mod scenechange;
 
 mod util;
 

@@ -10,6 +10,7 @@
 
 use crate::activity::ActivityMask;
 use crate::api::lookahead::*;
+use crate::api::scenechange::KeyframeDetector;
 use crate::api::{
   EncoderConfig, EncoderStatus, FrameType, Opaque, Packet, T35,
 };
@@ -26,7 +27,6 @@ use crate::stats::EncoderStats;
 use crate::tiling::Area;
 use crate::util::Pixel;
 use arrayvec::ArrayVec;
-use av_scenechange::SceneChangeDetector;
 use std::cmp;
 use std::collections::{BTreeMap, BTreeSet};
 use std::env;
@@ -245,7 +245,7 @@ pub(crate) struct ContextInner<T: Pixel> {
   gop_output_frameno_start: BTreeMap<u64, u64>,
   /// Maps `output_frameno` to `gop_input_frameno_start`.
   pub(crate) gop_input_frameno_start: BTreeMap<u64, u64>,
-  keyframe_detector: SceneChangeDetector<T>,
+  keyframe_detector: KeyframeDetector<T>,
   pub(crate) config: Arc<EncoderConfig>,
   seq: Arc<Sequence>,
   pub(crate) rc_state: RCState,
@@ -272,30 +272,7 @@ impl<T: Pixel> ContextInner<T> {
 
     let seq = Arc::new(Sequence::new(enc));
     let inter_cfg = InterConfig::new(enc);
-    let lookahead_distance = inter_cfg.keyframe_lookahead_distance() as usize;
-    let mut keyframe_detector = SceneChangeDetector::new(
-      (enc.width, enc.height),
-      enc.bit_depth,
-      av_scenechange::Rational32::new(
-        enc.time_base.den as i32,
-        enc.time_base.num as i32,
-      ),
-      enc.chroma_sampling,
-      lookahead_distance,
-      match enc.speed_settings.scene_detection_mode {
-        super::SceneDetectionSpeed::Fast => {
-          av_scenechange::SceneDetectionSpeed::Fast
-        }
-        super::SceneDetectionSpeed::Standard => {
-          av_scenechange::SceneDetectionSpeed::Standard
-        }
-        super::SceneDetectionSpeed::None => {
-          av_scenechange::SceneDetectionSpeed::None
-        }
-      },
-      enc.min_key_frame_interval as usize,
-      enc.max_key_frame_interval as usize,
-    );
+    let mut keyframe_detector = KeyframeDetector::new(enc);
     keyframe_detector.enable_cache();
 
     ContextInner {
@@ -859,9 +836,7 @@ impl<T: Pixel> ContextInner<T> {
       .unwrap()
       .lookahead_intra_costs = self
       .keyframe_detector
-      .intra_costs
-      .as_mut()
-      .and_then(|intra_costs| intra_costs.remove(&(fi.input_frameno as usize)))
+      .take_intra_costs(fi.input_frameno as usize)
       .unwrap_or_else(|| {
         // We use the cached values from scenechange above if available,
         // otherwise we need to calculate them here.
@@ -880,7 +855,7 @@ impl<T: Pixel> ContextInner<T> {
   #[profiling::function]
   pub fn compute_keyframe_placement(
     lookahead_frames: &[&Arc<Frame<T>>], keyframes_forced: &BTreeSet<u64>,
-    keyframe_detector: &mut SceneChangeDetector<T>,
+    keyframe_detector: &mut KeyframeDetector<T>,
     next_lookahead_frame: &mut u64, keyframes: &mut BTreeSet<u64>,
   ) {
     if keyframes_forced.contains(next_lookahead_frame)

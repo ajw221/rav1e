@@ -76,7 +76,7 @@ wasm = ["wasm-bindgen"]
 dump_lookahead_data = ["byteorder", "image"]
 
 [dependencies]
-av-scenechange = { version = "0.20.0", default-features = false, features = [
+av-scenechange = { version = "0.22", default-features = false, features = [
   "asm",
 ] }
 bitstream-io = "4.1.0"
