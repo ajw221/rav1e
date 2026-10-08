@@ -92,7 +92,7 @@ libc = "0.2"
 y4m = { version = "0.8", optional = true }
 backtrace = { version = "0.3", optional = true }
 num-traits = "0.2"
-num-derive = "0.4"
+num-derive = "0.5"
 pastey = "0.1.0"
 noop_proc_macro = "0.3.0"
 serde = { version = "1.0", features = ["derive"], optional = true }
