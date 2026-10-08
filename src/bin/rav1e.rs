@@ -441,6 +441,7 @@ fn run() -> Result<(), error::CliError> {
         } else {
           TransferFunction::BT1886
         },
+        full_range: false,
         chroma_grain: false,
         random_seed: None,
       },
